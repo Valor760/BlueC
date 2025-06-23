@@ -1,0 +1,8 @@
+- [X] Add CMake for build
+  - [ ] Continue improving CMake build
+  - [ ] Think what to do with Makefile
+- [ ] Dynamic Logging (for now just hardcoded printf's)
+  - [ ] Option to disable completely during compilation
+  - [ ] APIs to change log level at runtime
+  - [ ] APIs to redirect logging to FD
+- [ ] Set test build to OFF by default on project release
