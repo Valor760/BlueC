@@ -7,3 +7,4 @@
   - [ ] APIs to redirect logging to FD
 - [ ] Set test build to OFF by default on project release
 - [ ] Think if throwing ERR is a good idea, or switch to Exception class that wraps this value
+- [ ] All GIO/GLIBMM calls are throwing Gio::Error exceptins. Need to map them to our exception

@@ -2,10 +2,6 @@
 #include "utils/utils.h"
 #include "libctx.h"
 
-#include <glibmm/refptr.h>
-#include <giomm/dbusproxy.h>
-#include <glibmm/variant.h>
-
 namespace BlueC
 {
 
