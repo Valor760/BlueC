@@ -6,7 +6,7 @@
 int main()
 {
 	printf("Before init\n");
-	if(bluez_Init())
+	if(bluec_Init() != BLUEC_ERROR_NONE)
 	{
 		printf("Failed to init\n");
 		return -1;
@@ -15,7 +15,7 @@ int main()
 	sleep(2);
 
 	printf("Before deinit\n");
-	bluez_DeInit();
+	bluec_DeInit();
 	printf("deinit done\n");
 
 	return 0;

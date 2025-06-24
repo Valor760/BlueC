@@ -1,11 +1,9 @@
-#ifndef __LIB_BLUEZ_API
-#define __LIB_BLUEZ_API
+#ifndef __LIB_BLUEC_API
+#define __LIB_BLUEC_API
 
-#define LIBAPI __attribute__((visibility("default")))
+#include <bluec/types.h>
 
-LIBAPI int bluez_Init();
-LIBAPI void bluez_DeInit();
+LIBBLUEC_API BlueCErrorCodes bluec_Init();
+LIBBLUEC_API BlueCErrorCodes bluec_DeInit();
 
-#undef LIBAPI
-
-#endif /* __LIB_BLUEZ_SIMPLE_API */
+#endif /* __LIB_BLUEC_API */
