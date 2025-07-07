@@ -136,7 +136,22 @@ void BlueCTX::updateAdapterList()
 			dictEntry.get_child(iface, 0);
 			dictEntry.get_child(properties, 1);
 
-			LOG_ERROR("j=%lu children=%lu iface=%s", j, dictEntry.get_n_children(), iface.get().c_str());
+			LOG_ERROR("j=%lu children=%lu iface=%s", j, properties.get_n_children(), iface.get().c_str());
+			if(true)//iface.get() == "org.bluez.Adapter1" || iface.get() == "org.bluez.NetworkServer1")
+			{
+				for(size_t k = 0; k < properties.get_n_children(); k++)
+				{
+					Glib::VariantContainerBase property;
+        			properties.get_child(property, k);
+					Glib::Variant<std::string> propertyName;
+					Glib::VariantContainerBase propertyValue;
+					property.get_child(propertyName, 0);
+					property.get_child(propertyValue, 1);
+					Glib::Variant<std::string> variant;
+					propertyValue.get_child(variant);
+					LOG_ERROR("k=%lu propname=%s value=%s", k, propertyName.get().c_str(), variant.get().c_str());
+				}
+			}
 			// if (iface.get() != Device::Interface)
 			// 	continue;
 
