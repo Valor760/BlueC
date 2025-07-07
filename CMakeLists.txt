@@ -10,27 +10,31 @@ option(LIBBLUEC_INSTALL "Install built binaries to system" OFF)
 
 
 # ----- Requirements -----
-function(include_dir_find_or_error _VAR_NAME _INC_PATH _REQUIRED)
-	if(NOT EXISTS ${_INC_PATH})
+function(find_includes_for_package _PACKAGE_NAME _VAR_NAME _REQUIRED)
+	execute_process(
+		COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/scripts/get_includes.sh" ${_PACKAGE_NAME}
+		OUTPUT_VARIABLE _LOCAL_OUT
+		RESULT_VARIABLE _RETURN_CODE
+	)
+
+	if(NOT _RETURN_CODE EQUAL "0")
 		if(_REQUIRED)
-			message(FATAL_ERROR "[BlueC] Couldn't find mandatory include directoty at ${_INC_PATH}")
+			message(FATAL_ERROR "[BlueC] Couldn't find includes for mandatory package '${_PACKAGE_NAME}'")
 		else()
-			message(NOTICE "[BlueC] Couldn't find ${_INC_PATH} include directory. Not mandatory -- continue...")
+			message(NOTICE "[BlueC] Couldn't find includes for '${_PACKAGE_NAME}' package. Not mandatory -- continue...")
 		endif()
 	else()
-		set(${_VAR_NAME} ${_INC_PATH} PARENT_SCOPE)
+		# Replace spaces with separators, so all includes are properly feeded to "include_directories" function
+		string(REPLACE " " ";" _LOCAL_LIST ${_LOCAL_OUT})
+		set(${_VAR_NAME} ${_LOCAL_LIST} PARENT_SCOPE)
 	endif()
 endfunction()
 
-# TODO: Check if the following configs are always at the same path
-include_dir_find_or_error(_LIBBLUEC_GLIB_INC_PATH          "/usr/include/glib-2.0"        TRUE)
-include_dir_find_or_error(_LIBBLUEC_GLIB_INC_PATH_CONFIG   "/usr/lib/glib-2.0/include"    TRUE)
-include_dir_find_or_error(_LIBBLUEC_GLIBMM_INC_PATH        "/usr/include/glibmm-2.68"     TRUE)
-include_dir_find_or_error(_LIBBLUEC_GLIBMM_INC_PATH_CONFIG "/usr/lib/glibmm-2.68/include" TRUE)
-include_dir_find_or_error(_LIBBLUEC_SIGC_INC_PATH          "/usr/include/sigc++-3.0"      TRUE)
-include_dir_find_or_error(_LIBBLUEC_SIGC_INC_PATH_CONFIG   "/usr/lib/sigc++-3.0/include"  TRUE)
-include_dir_find_or_error(_LIBBLUEC_GIOMM_INC_PATH         "/usr/include/giomm-2.68"      TRUE)
-include_dir_find_or_error(_LIBBLUEC_GIOMM_INC_PATH_CONFIG  "/usr/lib/giomm-2.68/include"  TRUE)
+
+find_includes_for_package("glib-2.0"    _LIBBLUEC_GLIB_INC_PATH   TRUE)
+find_includes_for_package("glibmm-2.68" _LIBBLUEC_GLIBMM_INC_PATH TRUE)
+find_includes_for_package("sigc++-3.0"  _LIBBLUEC_SIGC_INC_PATH   TRUE)
+find_includes_for_package("giomm-2.68"  _LIBBLUEC_GIOMM_INC_PATH  TRUE)
 
 
 # ----- Internal Variables ------

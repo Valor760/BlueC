@@ -18,12 +18,14 @@ set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 message(DEBUG "[BlueC] Lib include path: ${_LIBBLUEC_INCLUDE_PATH}")
 message(DEBUG "[BlueC] glib include path: ${_LIBBLUEC_GLIB_INC_PATH}")
 message(DEBUG "[BlueC] glibmm include path: ${_LIBBLUEC_GLIBMM_INC_PATH}")
+message(DEBUG "[BlueC] sigc include path: ${_LIBBLUEC_SIGC_INC_PATH}")
+message(DEBUG "[BlueC] giomm include path: ${_LIBBLUEC_GIOMM_INC_PATH}")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${_LIBBLUEC_INCLUDE_PATH})
-include_directories(${_LIBBLUEC_GLIB_INC_PATH} ${_LIBBLUEC_GLIB_INC_PATH_CONFIG})
-include_directories(${_LIBBLUEC_GLIBMM_INC_PATH} ${_LIBBLUEC_GLIBMM_INC_PATH_CONFIG})
-include_directories(${_LIBBLUEC_SIGC_INC_PATH} ${_LIBBLUEC_SIGC_INC_PATH_CONFIG})
-include_directories(${_LIBBLUEC_GIOMM_INC_PATH} ${_LIBBLUEC_GIOMM_INC_PATH_CONFIG})
+include_directories(${_LIBBLUEC_GLIB_INC_PATH})
+include_directories(${_LIBBLUEC_GLIBMM_INC_PATH})
+include_directories(${_LIBBLUEC_SIGC_INC_PATH})
+include_directories(${_LIBBLUEC_GIOMM_INC_PATH})
 
 
 # ----- Linker options -----
