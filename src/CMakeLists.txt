@@ -5,7 +5,7 @@ project(${LIBRARY})
 
 
 # ----- Compiler options -----
-set(CMAKE_CXX_STANDARD 17) # TODO: Upgrade to C++20?
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall") # TODO: Provide different flags based on DEBUG/RELEASE build
 # Remove full path from filename
 # TODO: Check if other compilers are compatible with this
