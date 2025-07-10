@@ -30,7 +30,7 @@ std::shared_ptr<BlueCTX> getCTX()
 	return g_CTX;
 }
 
-void allocCTX()
+void allocCTX(bool runMainLoop)
 {
 	std::lock_guard lg(ctxLock);
 	if(g_CTX)
@@ -39,7 +39,7 @@ void allocCTX()
 		throw BLUEC_ERROR_ALREADY_INIT;
 	}
 
-	g_CTX = std::make_shared<BlueCTX>();
+	g_CTX = std::make_shared<BlueCTX>(runMainLoop);
 }
 
 void deallocCTX()
@@ -83,15 +83,19 @@ static ObjectType getObjectType(const Glib::VariantContainerBase& interfaceArr)
 	return ObjectType::UNKNOWN;
 }
 
-BlueCTX::BlueCTX()
+BlueCTX::BlueCTX(bool runMainLoop)
 {
 	LOG_DEBUG("Init");
 	Glib::init();
 
-	initMainLoop();
+	if(runMainLoop)
+	{
+		initMainLoop();
+	}
+
 	initObjectManager();
 	updateObjectList();
-
+	
 	bluezObjManager->signal_signal().connect(sigc::mem_fun(*this, &BlueCTX::onSignal));
 
 	LOG_DEBUG("Init done");
@@ -100,6 +104,11 @@ BlueCTX::BlueCTX()
 BlueCTX::~BlueCTX()
 {
 	LOG_DEBUG("Deinit");
+
+	if(mainLoop)
+	{
+		mainLoop->quit();
+	}
 }
 
 void BlueCTX::initObjectManager()
@@ -120,32 +129,9 @@ void BlueCTX::initObjectManager()
 	LOG_TRACE("Object manager created: %p", bluezObjManager.get());
 }
 
-static void runLoop(Glib::RefPtr<Glib::MainLoop> loop)
-{
-	auto ctx = loop->get_context();
-	ctx->push_thread_default();
-
-	// while(ctx->iteration(true))
-	// {
-	// 	ctx->dispatch();
-	// }
-	LOG_DEBUG("Main loop run start");
-	loop->run();
-	LOG_DEBUG("Main loop run end");
-}
-
 void BlueCTX::initMainLoop()
 {
-	Glib::RefPtr<Glib::MainContext> loopCtx = Glib::MainContext::create();
-	if(!loopCtx)
-	{
-		LOG_ERROR("Failed to create MainLoop Context");
-		throw BLUEC_ERROR_INTERNAL; // TODO: Different error code
-	}
-	LOG_TRACE("Loop Context created: %p", loopCtx.get());
-
-	mainLoop = Glib::MainLoop::create(loopCtx, true);
-	// mainLoop = Glib::MainLoop::create();
+	mainLoop = Glib::MainLoop::create();
 	if(!mainLoop)
 	{
 		LOG_ERROR("Failed to create MainLoop");
@@ -153,7 +139,9 @@ void BlueCTX::initMainLoop()
 	}
 	LOG_TRACE("MainLoop created: %p", mainLoop.get());
 
-	std::thread th(runLoop, mainLoop);
+	std::thread th([this](){
+		mainLoop->run();
+	});
 	th.detach();
 }
 

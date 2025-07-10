@@ -5,9 +5,9 @@
 namespace BlueC
 {
 
-static BlueCErrorCodes __Init()
+static BlueCErrorCodes __Init(bool runMainLoop)
 {
-	allocCTX();
+	allocCTX(runMainLoop);
 	return BLUEC_ERROR_NONE;
 }
 
@@ -20,9 +20,9 @@ static BlueCErrorCodes __DeInit()
 } // namespace BlueC
 
 
-BlueCErrorCodes bluec_Init()
+BlueCErrorCodes bluec_Init(bool runMainLoop)
 {
-	MAKE_INTERNAL_CALL(BlueC::__Init());
+	MAKE_INTERNAL_CALL(BlueC::__Init(runMainLoop));
 }
 
 BlueCErrorCodes bluec_DeInit()

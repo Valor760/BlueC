@@ -26,12 +26,12 @@ class BlueCTX
 	void onSignal(const Glib::ustring& sender, const Glib::ustring& signal, const Glib::VariantContainerBase& params);
 
 public:
-	BlueCTX();
+	BlueCTX(bool runMainLoop);
 	~BlueCTX();
 };
 
 std::shared_ptr<BlueCTX> getCTX();
-void allocCTX();
+void allocCTX(bool runMainLoop);
 void deallocCTX();
 
 } // namespace BlueC

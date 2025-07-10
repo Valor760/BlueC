@@ -1,5 +1,4 @@
-#ifndef __LIB_BLUEC_TYPES_H
-#define __LIB_BLUEC_TYPES_H
+#pragma once
 
 #define LIBBLUEC_API __attribute__((visibility("default")))
 
@@ -10,5 +9,3 @@ typedef enum BlueCErrorCodes
 	BLUEC_ERROR_ALREADY_INIT = -2, // Library is already initialized
 	BLUEC_ERROR_NOT_INIT     = -3, // Library is NOT yet initialized
 } BlueCErrorCodes;
-
-#endif /* __LIB_BLUEC_TYPES_H */

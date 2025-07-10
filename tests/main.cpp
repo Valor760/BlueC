@@ -6,7 +6,7 @@
 int main()
 {
 	printf("Before init\n");
-	if(bluec_Init() != BLUEC_ERROR_NONE)
+	if(bluec_Init(true) != BLUEC_ERROR_NONE)
 	{
 		printf("Failed to init\n");
 		return -1;
