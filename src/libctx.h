@@ -14,13 +14,16 @@ class BlueCTX
 {
 	AdapterList adapterList;
 	Glib::RefPtr<GDBus::Proxy> bluezObjManager;
-	Glib::RefPtr<Glib::MainContext> loopCtx;
 	Glib::RefPtr<Glib::MainLoop> mainLoop;
 
 
 	void initMainLoop();
 	void initObjectManager();
-	void updateAdapterList();
+	void updateObjectList();
+
+	void processAdapter(const std::string& path, const Glib::VariantContainerBase& ifaces);
+
+	void onSignal(const Glib::ustring& sender, const Glib::ustring& signal, const Glib::VariantContainerBase& params);
 
 public:
 	BlueCTX();

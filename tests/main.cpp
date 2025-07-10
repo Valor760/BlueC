@@ -14,6 +14,8 @@ int main()
 	printf("init done\n");
 	sleep(2);
 
+	while(true) { sleep(60); }
+
 	printf("Before deinit\n");
 	bluec_DeInit();
 	printf("deinit done\n");

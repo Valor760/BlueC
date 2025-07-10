@@ -12,25 +12,30 @@
 
 namespace GDBus = Gio::DBus;
 
+// TODO: Maybe move these strings to related classes
 namespace BlueC::Bluez
 {
-
-const_str BusName = "org.bluez";
-const_str PathPrefix = "/org/bluez";
+	const_str BusName = "org.bluez";
+	const_str PathPrefix = "/org/bluez";
 
 	namespace ObjectManager
 	{
-
 		const_str Interface = "org.freedesktop.DBus.ObjectManager";
-
 		namespace Methods
 		{
-
 			const_str GetObjects = "GetManagedObjects";
+		}
+	}
 
-		} // namespace BlueC::Bluez::ObjectManager::Methods
+	namespace Adapter
+	{
+		const_str Interface = "org.bluez.Adapter1";
+	}
 
-	} // namespace BlueC::Bluez::ObjectManager
+	namespace Device
+	{
+		const_str Interface = "org.bluez.Device1";
+	}
 
 } // namespace BlueC::Bluez
 

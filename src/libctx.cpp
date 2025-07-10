@@ -4,9 +4,22 @@
 
 #include <mutex>
 #include <thread>
+#include <map>
 
 namespace BlueC
 {
+
+enum class ObjectType
+{
+	UNKNOWN,
+	ADAPTER,
+	DEVICE,
+};
+
+static const std::map<std::string, ObjectType> g_IfaceObjectMap = {
+	{Bluez::Adapter::Interface, ObjectType::ADAPTER},
+	{Bluez::Device::Interface, ObjectType::DEVICE},
+};
 
 static std::shared_ptr<BlueCTX> g_CTX = nullptr;
 static std::mutex ctxLock;
@@ -50,14 +63,36 @@ void deallocCTX()
 	g_CTX = nullptr;
 }
 
+static ObjectType getObjectType(const Glib::VariantContainerBase& interfaceArr)
+{
+	for(gsize i = 0; i < interfaceArr.get_n_children(); i++)
+	{
+		Glib::VariantContainerBase entry;
+		interfaceArr.get_child(entry, i);
+
+		Glib::Variant<std::string> iface;
+		entry.get_child(iface, 0);
+
+		const auto it = g_IfaceObjectMap.find(iface.get());
+		if(it != std::end(g_IfaceObjectMap))
+		{
+			return it->second;
+		}
+	}
+
+	return ObjectType::UNKNOWN;
+}
+
 BlueCTX::BlueCTX()
 {
 	LOG_DEBUG("Init");
 	Glib::init();
 
-	// initMainLoop();
+	initMainLoop();
 	initObjectManager();
-	updateAdapterList();
+	updateObjectList();
+
+	bluezObjManager->signal_signal().connect(sigc::mem_fun(*this, &BlueCTX::onSignal));
 
 	LOG_DEBUG("Init done");
 }
@@ -85,9 +120,23 @@ void BlueCTX::initObjectManager()
 	LOG_TRACE("Object manager created: %p", bluezObjManager.get());
 }
 
+static void runLoop(Glib::RefPtr<Glib::MainLoop> loop)
+{
+	auto ctx = loop->get_context();
+	ctx->push_thread_default();
+
+	// while(ctx->iteration(true))
+	// {
+	// 	ctx->dispatch();
+	// }
+	LOG_DEBUG("Main loop run start");
+	loop->run();
+	LOG_DEBUG("Main loop run end");
+}
+
 void BlueCTX::initMainLoop()
 {
-	loopCtx = Glib::MainContext::create(Glib::MainContextFlags::OWNERLESS_POLLING);
+	Glib::RefPtr<Glib::MainContext> loopCtx = Glib::MainContext::create();
 	if(!loopCtx)
 	{
 		LOG_ERROR("Failed to create MainLoop Context");
@@ -96,15 +145,19 @@ void BlueCTX::initMainLoop()
 	LOG_TRACE("Loop Context created: %p", loopCtx.get());
 
 	mainLoop = Glib::MainLoop::create(loopCtx, true);
+	// mainLoop = Glib::MainLoop::create();
 	if(!mainLoop)
 	{
 		LOG_ERROR("Failed to create MainLoop");
 		throw BLUEC_ERROR_INTERNAL; // TODO: Different error code
 	}
 	LOG_TRACE("MainLoop created: %p", mainLoop.get());
+
+	std::thread th(runLoop, mainLoop);
+	th.detach();
 }
 
-void BlueCTX::updateAdapterList()
+void BlueCTX::updateObjectList()
 {
 	auto result = bluezObjManager->call_sync(Bluez::ObjectManager::Methods::GetObjects);
 
@@ -125,6 +178,22 @@ void BlueCTX::updateAdapterList()
 
 		Glib::VariantContainerBase ifaceDict;
 		obj.get_child(ifaceDict, 1);
+
+		auto objType = getObjectType(ifaceDict);
+		switch(objType)
+		{
+			case ObjectType::ADAPTER:
+				break;
+
+			case ObjectType::DEVICE:
+				break;
+
+			case ObjectType::UNKNOWN:
+				[[fallthrough]];
+			default:
+				LOG_DEBUG("UNKNOWN object at %s path", path.get().c_str());
+				break;
+		}
 
 		for(size_t j = 0; j < ifaceDict.get_n_children(); j++)
 		{
@@ -165,6 +234,14 @@ void BlueCTX::updateAdapterList()
 			// _pathToAddressMap.insert(std::pair<std::string, std::string>(device_path, device_address));
 		}
 	}
+}
+
+void BlueCTX::onSignal(const Glib::ustring& sender, const Glib::ustring& signal, const Glib::VariantContainerBase& params)
+{
+	Glib::Variant<std::string> path;
+	params.get_child(path, 0);
+
+	LOG_DEBUG("ObjManager event: sender=%s signal=%s path=%s", sender.c_str(), signal.c_str(), path.get().c_str());
 }
 
 } // namespace BlueC
